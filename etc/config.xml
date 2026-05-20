@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <etechflow_backorderetadisplay>
+            <license>
+                <license_key></license_key>
+            </license>
+            <general>
+                <enabled>1</enabled>
+                <default_eta>5-7 business days</default_eta>
+                <label_prefix>Ships in</label_prefix>
+            </general>
+            <display>
+                <show_on_product_page>1</show_on_product_page>
+                <show_on_cart>1</show_on_cart>
+                <show_on_checkout>1</show_on_checkout>
+                <show_in_order_email>1</show_in_order_email>
+                <badge_style>warning</badge_style>
+            </display>
+        </etechflow_backorderetadisplay>
+    </default>
+</config>

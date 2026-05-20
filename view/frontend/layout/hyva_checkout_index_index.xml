@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+    Hyvä Checkout integration. This layout handle is only loaded when
+    the Hyvä Checkout module is installed; on stores without Hyvä Checkout
+    this file has no effect.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="checkout.shipping.before">
+            <block name="etechflow.backorder.eta.hyva.summary"
+                   template="ETechFlow_BackorderEtaDisplay::checkout/hyva-eta-summary.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">
+                        ETechFlow\BackorderEtaDisplay\ViewModel\HyvaCheckoutEta
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

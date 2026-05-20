@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="checkout.cart.form.before">
+            <block class="ETechFlow\BackorderEtaDisplay\Block\Cart\EtaSummary"
+                   name="etechflow.backorder.eta.cart.summary"
+                   template="ETechFlow_BackorderEtaDisplay::cart/eta-summary.phtml"
+                   before="-"/>
+        </referenceContainer>
+    </body>
+</page>

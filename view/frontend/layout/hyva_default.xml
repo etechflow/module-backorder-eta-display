@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+    Hyvä theme override. When the active store theme inherits from the
+    Hyvä parent theme, this handle loads automatically and swaps the
+    product page badge and cart summary templates for Tailwind-styled
+    versions. On Luma stores this file has no effect.
+
+    Hyvä Checkout (checkout_index_index variant) is handled separately
+    in hyva_checkout_index_index.xml.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="etechflow.backorder.eta.badge"
+                        template="ETechFlow_BackorderEtaDisplay::hyva/product/eta-badge.phtml"/>
+        <referenceBlock name="etechflow.backorder.eta.cart.summary"
+                        template="ETechFlow_BackorderEtaDisplay::hyva/cart/eta-summary.phtml"/>
+    </body>
+</page>

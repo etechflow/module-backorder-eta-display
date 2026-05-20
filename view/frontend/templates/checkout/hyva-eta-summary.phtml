@@ -1,0 +1,77 @@
+<?php
+/**
+ * Hyvä Checkout backorder ETA summary — Tailwind + Alpine.
+ *
+ * Dark-mode and reduced-motion variants; aria-live so screen readers
+ * announce ETA updates when the cart changes during checkout.
+ *
+ * @var \ETechFlow\BackorderEtaDisplay\ViewModel\HyvaCheckoutEta $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ *
+ * --- Tailwind safelist ---
+ * The container/accent classes below are emitted by HyvaCheckoutEta::getStyleClasses(),
+ * which lives in a .php file that Hyvä's default content scan does NOT cover. Repeat the
+ * full set here so Tailwind's class detection (which reads .phtml file text as a string)
+ * keeps every utility class through the purge step. Works for Tailwind 3 and 4.
+ *
+ *   bg-blue-50 text-blue-900 border-blue-500 dark:bg-blue-900/20 dark:text-blue-200 dark:border-blue-400
+ *   text-blue-600 dark:text-blue-300
+ *   bg-slate-100 text-slate-800 border-slate-500 dark:bg-slate-700/30 dark:text-slate-200 dark:border-slate-400
+ *   text-slate-600 dark:text-slate-300
+ *   bg-amber-50 text-amber-900 border-amber-500 dark:bg-amber-900/20 dark:text-amber-200 dark:border-amber-400
+ *   text-amber-600 dark:text-amber-300
+ */
+$viewModel = $block->getData('view_model');
+
+if (!$viewModel || !$viewModel->isVisible()) {
+    return;
+}
+
+$styles  = $viewModel->getStyleClasses();
+$entries = $viewModel->getBackorderEntries();
+?>
+<div x-data="{ visible: true, show: false }"
+     x-init="$nextTick(() => show = true)"
+     x-show="visible && show"
+     x-cloak
+     x-transition:enter="motion-safe:transition motion-safe:ease-out motion-safe:duration-300"
+     x-transition:enter-start="motion-safe:opacity-0 motion-safe:-translate-y-1"
+     x-transition:enter-end="motion-safe:opacity-100 motion-safe:translate-y-0"
+     x-transition:leave="motion-safe:transition motion-safe:ease-in motion-safe:duration-150"
+     x-transition:leave-start="motion-safe:opacity-100"
+     x-transition:leave-end="motion-safe:opacity-0"
+     class="etechflow-eta-summary border-l-4 rounded-md p-4 mb-6 shadow-sm <?= $escaper->escapeHtmlAttr($styles['container']) ?>"
+     role="status"
+     aria-live="polite">
+    <div class="flex items-start gap-3">
+        <!-- Clock icon (Heroicons outline) -->
+        <svg class="w-5 h-5 flex-shrink-0 mt-0.5 <?= $escaper->escapeHtmlAttr($styles['accent']) ?>"
+             fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div class="flex-1 min-w-0">
+            <strong class="block font-bold text-base mb-2">
+                <?= $escaper->escapeHtml(__('Estimated delivery times')) ?>
+            </strong>
+            <ul class="space-y-1 text-sm">
+                <?php foreach ($entries as $entry): ?>
+                    <li class="flex justify-between gap-3 border-t border-current/10 pt-1 first:border-t-0 first:pt-0">
+                        <span class="font-medium truncate"><?= $escaper->escapeHtml($entry['name']) ?></span>
+                        <span class="font-semibold opacity-90 whitespace-nowrap">
+                            <?= $escaper->escapeHtml($entry['eta']) ?>
+                        </span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+        <button type="button"
+                @click="visible = false"
+                class="flex-shrink-0 p-1 -m-1 rounded hover:bg-black/5 dark:hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-current/30"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Dismiss')) ?>">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+</div>

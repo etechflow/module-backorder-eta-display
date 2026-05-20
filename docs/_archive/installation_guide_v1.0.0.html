@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Backorder Shipping Restrictor — Installation Guide</title>
+    <style>
+        body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; color: #1f2937; line-height: 1.6; }
+        h1 { border-bottom: 2px solid #dc2626; padding-bottom: 8px; }
+        h2 { color: #b91c1c; margin-top: 32px; border-bottom: 1px solid #fecaca; padding-bottom: 4px; }
+        h3 { color: #991b1b; }
+        code { background: #fef2f2; padding: 2px 6px; border-radius: 3px; font-size: 0.92em; }
+        pre { background: #1f2937; color: #f9fafb; padding: 14px 18px; border-radius: 5px; overflow-x: auto; font-size: 0.85em; line-height: 1.5; }
+        pre code { background: none; color: inherit; padding: 0; }
+        table { border-collapse: collapse; margin: 12px 0; width: 100%; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px 12px; text-align: left; vertical-align: top; }
+        th { background: #fef2f2; }
+        .note { background: #fef2f2; border-left: 4px solid #dc2626; padding: 12px 16px; margin: 16px 0; border-radius: 0 5px 5px 0; }
+        .warning { background: #fef2f2; border-left: 4px solid #991b1b; padding: 12px 16px; margin: 16px 0; border-radius: 0 5px 5px 0; }
+        .step { background: #f8fafc; border-left: 4px solid #475569; padding: 12px 16px; margin: 16px 0; }
+    </style>
+</head>
+<body>
+
+<h1>Backorder Shipping Restrictor — Installation Guide</h1>
+
+<p><strong>Version 1.0.1</strong> · for Magento Open Source / Adobe Commerce 2.4.4+</p>
+
+<p>This guide walks you through installing the module, entering your licence key, and configuring which shipping methods to restrict. Estimated time: <strong>10 minutes</strong>.</p>
+
+<h2>1. Prerequisites</h2>
+
+<table>
+    <tr><th>Component</th><th>Required version</th></tr>
+    <tr><td>Magento Open Source <em>or</em> Adobe Commerce</td><td>2.4.4 or newer</td></tr>
+    <tr><td>PHP</td><td>8.1, 8.2, 8.3, or 8.4</td></tr>
+    <tr><td>MySQL / MariaDB</td><td>Per Magento requirements</td></tr>
+    <tr><td>Composer (for Option A)</td><td>2.x</td></tr>
+    <tr><td>Hyvä Checkout <em>(optional)</em></td><td>1.0+ — if you use it, our Hyvä-specific notice auto-activates</td></tr>
+</table>
+
+<h2>2. Installation</h2>
+
+<h3>Option A — Composer (recommended)</h3>
+
+<pre><code>composer require etechflow/module-backorder-shipping-restrictor:^1.0
+bin/magento module:enable ETechFlow_BackorderShippingRestrictor
+bin/magento setup:upgrade
+bin/magento setup:di:compile
+bin/magento cache:flush</code></pre>
+
+<h3>Option B — Manual install from zip</h3>
+
+<div class="step">
+<strong>Step B-1.</strong> Unzip <code>etechflow-module-backorder-shipping-restrictor-1.0.1.zip</code> into your Magento install at:
+
+<pre><code>&lt;magento-root&gt;/app/code/ETechFlow/BackorderShippingRestrictor/</code></pre>
+</div>
+
+<div class="warning">
+<strong>Important — case-sensitive directory name.</strong> The folder must be named <code>ETechFlow</code> (capital E, capital T, capital F). On Linux servers, <code>eTechFlow</code> (lowercase e) is a <em>different</em> directory and will not work. On macOS the filesystem is case-insensitive so it appears to work locally, but breaks when deployed.
+</div>
+
+<div class="step">
+<strong>Step B-2.</strong> Enable the module and run setup:
+
+<pre><code>bin/magento module:enable ETechFlow_BackorderShippingRestrictor
+bin/magento setup:upgrade
+bin/magento setup:di:compile
+bin/magento cache:flush</code></pre>
+</div>
+
+<div class="step">
+<strong>Step B-3.</strong> Verify the module is enabled:
+
+<pre><code>bin/magento module:status | grep BackorderShippingRestrictor</code></pre>
+
+<p>You should see <code>ETechFlow_BackorderShippingRestrictor</code> listed under "List of enabled modules".</p>
+</div>
+
+<h2>3. Enter your licence key</h2>
+
+<div class="step">
+
+<p>In the admin panel, navigate to:</p>
+
+<p><strong>Stores → Configuration → eTechFlow → Backorder Shipping Restrictor</strong></p>
+
+<p>Expand the <strong>Licence</strong> section. Paste the key from your purchase email into the <strong>Licence Key</strong> field. Click <strong>Save Config</strong>.</p>
+
+</div>
+
+<div class="note">
+<strong>Don't have a licence key yet?</strong> The module runs for free on dev/staging environments. If your Magento install is reachable at <code>localhost</code>, <code>*.test</code>, <code>*.local</code>, <code>staging.*</code>, <code>dev.*</code>, <code>*.magento.cloud</code>, ngrok tunnels, or RFC 1918 private IPs, no licence key is needed.
+</div>
+
+<h2>4. Configure the shipping methods to remove</h2>
+
+<p>Still on the same admin page, expand the <strong>General</strong> section:</p>
+
+<table>
+    <tr><th>Field</th><th>What to enter</th></tr>
+    <tr><td>Enabled</td><td>Yes</td></tr>
+    <tr>
+        <td>Shipping Method Codes</td>
+        <td>
+            Multi-select. Choose the shipping methods you want REMOVED when a backorder item is in the cart. Format: <code>carrier_method</code>.
+            <br><br>
+            Common examples:
+            <ul>
+                <li><code>ups_NextDayAir</code> — UPS Next Day Air</li>
+                <li><code>fedex_FEDEX_2_DAY</code> — FedEx 2-day</li>
+                <li><code>royalmail_tracked24</code> — Royal Mail Tracked 24</li>
+                <li><code>dpd_NextDay</code> — DPD Next Day</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>Skip Drop-Ship Products</td>
+        <td>
+            Set to <strong>Yes</strong> if you also have <code>ETechFlow_NextDayEligibility</code> installed and want drop-shipped products to be exempt from the restriction.
+            <br><br>
+            Set to <strong>No</strong> if you don't have NextDayEligibility, or if you want the restriction to apply regardless.
+        </td>
+    </tr>
+</table>
+
+<p>Click <strong>Save Config</strong>.</p>
+
+<h2>5. Configure the customer notice</h2>
+
+<p>Expand the <strong>Notice</strong> section:</p>
+
+<table>
+    <tr><th>Field</th><th>Recommended value</th></tr>
+    <tr><td>Show Notice</td><td>Yes</td></tr>
+    <tr>
+        <td>Notice Style</td>
+        <td>
+            <code>warning</code> (amber) — standard, matches "something requires your attention".
+            <br><code>info</code> (blue) — neutral informational.
+            <br><code>error</code> (red) — strong signal.
+        </td>
+    </tr>
+    <tr>
+        <td>Notice Title</td>
+        <td>Example: <code>Express shipping unavailable</code></td>
+    </tr>
+    <tr>
+        <td>Notice Message</td>
+        <td>Example: <code>One or more items in your cart is on backorder. Standard shipping is available — express options have been removed.</code></td>
+    </tr>
+</table>
+
+<p>Click <strong>Save Config</strong>.</p>
+
+<h2>6. Verify it's working</h2>
+
+<div class="step">
+
+<ol>
+    <li>Find a product currently on backorder (or temporarily mark one Out of Stock + enable backorders)</li>
+    <li>Add it to a cart</li>
+    <li>Proceed to checkout</li>
+    <li>On the shipping step, you should see:
+        <ul>
+            <li>The notice at the top with your configured title and message</li>
+            <li>The shipping rate list <strong>without</strong> the methods you configured in Shipping Method Codes</li>
+            <li>Other shipping methods (standard delivery, etc.) still available</li>
+        </ul>
+    </li>
+    <li>Remove the backorder item from the cart (or replace it with an in-stock product)</li>
+    <li>Reload checkout — the notice should disappear, and all shipping methods including express should be available</li>
+</ol>
+
+<p>If anything doesn't appear, check <code>var/log/exception.log</code> for entries containing <code>etechflow</code>. Most issues are licence-key related or cache-related (try <code>bin/magento cache:flush</code>).</p>
+
+</div>
+
+<h2>7. Luma vs Hyvä Checkout</h2>
+
+<p>The module supports both checkouts automatically:</p>
+
+<ul>
+    <li><strong>Standard Luma (Knockout) checkout</strong>: notice is injected via a ConfigProvider into <code>window.checkoutConfig</code>. Rendered by a Knockout component.</li>
+    <li><strong>Hyvä Checkout</strong>: notice is rendered server-side via a Tailwind <code>.phtml</code> template with Alpine.js for the dismiss button. Dark-mode and reduced-motion variants included.</li>
+</ul>
+
+<p>You don't need to switch modes — the module detects the active checkout and renders accordingly.</p>
+
+<h2>8. Common installation issues</h2>
+
+<table>
+    <tr><th>Symptom</th><th>Fix</th></tr>
+    <tr>
+        <td>Setup:upgrade fails with "module not found"</td>
+        <td>Directory must be <code>ETechFlow</code> (capital ETF), not <code>eTechFlow</code>. Rename and retry.</td>
+    </tr>
+    <tr>
+        <td>setup:di:compile fails on this module</td>
+        <td>Almost always a PHP version issue. Verify <code>php -v</code> shows 8.1+. Magento DI compile uses CLI PHP.</td>
+    </tr>
+    <tr>
+        <td>Notice doesn't appear in standard Luma checkout</td>
+        <td>Check <code>window.checkoutConfig.backorderRestrictor</code> in browser console. If undefined when cart has a backorder item: cache flush + <code>setup:static-content:deploy -f</code>. Most common cause: leftover stale frontend assets.</td>
+    </tr>
+    <tr>
+        <td>Notice doesn't appear on Hyvä Checkout</td>
+        <td>Verify Hyvä Checkout is the active checkout. Verify the template path exists. Verify Hyvä's <code>tailwind.config.js</code> content array includes our template path (Hyvä's default config does).</td>
+    </tr>
+    <tr>
+        <td>Shipping methods aren't being filtered even though notice appears</td>
+        <td>The notice and the filtering use the same plugin, so if the notice shows, the plugin IS running. Check that your Shipping Method Codes match the exact code format Magento uses for those methods (<code>carrier_method</code> with the right case and underscores).</td>
+    </tr>
+    <tr>
+        <td>"Skip Drop-Ship Products" toggle has no effect</td>
+        <td>This toggle requires <code>ETechFlow_NextDayEligibility</code> to also be installed (it provides the <code>drop_ship_eligible</code> attribute). Without NextDayEligibility, the module silently treats all products as non-drop-ship.</td>
+    </tr>
+</table>
+
+<h2>9. Uninstall</h2>
+
+<pre><code>bin/magento module:disable ETechFlow_BackorderShippingRestrictor
+composer remove etechflow/module-backorder-shipping-restrictor    # if installed via Composer
+# OR
+rm -rf app/code/ETechFlow/BackorderShippingRestrictor              # if installed manually
+bin/magento setup:upgrade
+bin/magento cache:flush</code></pre>
+
+<div class="note">
+<strong>Note:</strong> This module does not add any product attributes or database tables, so uninstall is clean — nothing to drop from your database.
+</div>
+
+<h2>10. Support</h2>
+
+<p>If you hit anything not covered above, email <a href="mailto:support@etechflow.com">support@etechflow.com</a> with:</p>
+
+<ul>
+    <li>Your Magento version and PHP version</li>
+    <li>The module version (<code>composer show etechflow/module-backorder-shipping-restrictor</code> or check <code>composer.json</code>)</li>
+    <li>The exact error message and the contents of <code>var/log/exception.log</code> for the relevant time window</li>
+    <li>Steps to reproduce</li>
+</ul>
+
+<p>Typical first response within one business day.</p>
+
+</body>
+</html>

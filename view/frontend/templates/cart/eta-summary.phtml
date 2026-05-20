@@ -1,0 +1,84 @@
+<?php
+/**
+ * Backorder ETA summary on the shopping cart page.
+ *
+ * @var \ETechFlow\BackorderEtaDisplay\Block\Cart\EtaSummary $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+if (!$block->isVisible()) {
+    return;
+}
+
+$style   = $block->getBadgeStyle();
+$entries = $block->getBackorderEntries();
+?>
+<div class="etechflow-eta-summary etechflow-eta-summary--<?= $escaper->escapeHtmlAttr($style) ?>"
+     role="note"
+     aria-label="<?= $escaper->escapeHtmlAttr(__('Estimated delivery times')) ?>">
+    <strong class="etechflow-eta-summary__title">
+        <?= $escaper->escapeHtml(__('Estimated delivery times')) ?>
+    </strong>
+    <ul class="etechflow-eta-summary__list">
+        <?php foreach ($entries as $entry): ?>
+            <li class="etechflow-eta-summary__item">
+                <span class="etechflow-eta-summary__name"><?= $escaper->escapeHtml($entry['name']) ?></span>
+                <span class="etechflow-eta-summary__eta"><?= $escaper->escapeHtml($entry['eta']) ?></span>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>
+<style>
+    .etechflow-eta-summary {
+        margin: 0 0 16px;
+        padding: 14px 18px;
+        border-radius: 6px;
+        border-left: 4px solid;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    .etechflow-eta-summary__title {
+        display: block;
+        font-weight: 700;
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+    .etechflow-eta-summary__list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .etechflow-eta-summary__item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 4px 0;
+        border-top: 1px dotted rgba(0, 0, 0, 0.1);
+    }
+    .etechflow-eta-summary__item:first-child {
+        border-top: none;
+    }
+    .etechflow-eta-summary__name {
+        flex: 1;
+        font-weight: 500;
+    }
+    .etechflow-eta-summary__eta {
+        flex-shrink: 0;
+        font-weight: 600;
+        opacity: 0.85;
+    }
+    .etechflow-eta-summary--warning {
+        background: #fff8e1;
+        color: #5d4037;
+        border-left-color: #f59e0b;
+    }
+    .etechflow-eta-summary--info {
+        background: #e3f2fd;
+        color: #0d47a1;
+        border-left-color: #1976d2;
+    }
+    .etechflow-eta-summary--neutral {
+        background: #f1f5f9;
+        color: #334155;
+        border-left-color: #64748b;
+    }
+</style>

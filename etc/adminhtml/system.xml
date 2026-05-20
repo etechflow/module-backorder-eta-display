@@ -1,0 +1,229 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="etechflow" translate="label" sortOrder="400">
+            <label>eTechFlow</label>
+        </tab>
+        <section id="etechflow_backorderetadisplay"
+                 translate="label"
+                 type="text"
+                 sortOrder="120"
+                 showInDefault="1"
+                 showInWebsite="1"
+                 showInStore="1">
+            <label>Backorder ETA Display</label>
+            <tab>etechflow</tab>
+            <resource>ETechFlow_BackorderEtaDisplay::config</resource>
+
+            <!-- ============================================================
+                 STATUS BANNER — first thing the merchant sees.
+            ============================================================ -->
+            <group id="module_status"
+                   translate="label"
+                   type="text"
+                   sortOrder="1"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Module Status</label>
+                <frontend_model>ETechFlow\BackorderEtaDisplay\Block\Adminhtml\System\Config\ModuleStatus</frontend_model>
+            </group>
+
+            <group id="license"
+                   translate="label"
+                   type="text"
+                   sortOrder="5"
+                   showInDefault="1"
+                   showInWebsite="0"
+                   showInStore="0">
+                <label>License</label>
+                <field id="production_environment"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="5"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>Production Environment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[
+                        <strong>Yes</strong> = this is your live site. The module checks the licence
+                        key against the current domain. If invalid, the module silently disables itself.<br/>
+                        <strong>No</strong> = this is dev/staging. The module runs at full features
+                        without a licence — use this on non-standard dev domains the auto-detector misses.<br/>
+                        Default: Yes.
+                    ]]></comment>
+                </field>
+                <field id="license_key"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="0"
+                       showInStore="0">
+                    <label>License Key</label>
+                    <comment><![CDATA[
+                        Paste the key from your purchase email. Bound to the domain you provided at checkout.<br/>
+                        Auto-bypassed for development hosts (<code>localhost</code>, <code>*.test</code>,
+                        <code>*.local</code>, <code>staging.*</code>, <code>*.magento.cloud</code>, ngrok, etc.) —
+                        no key needed there.<br/>
+                        <code>www.</code> prefix is normalised — one key works for both <code>shop.com</code>
+                        and <code>www.shop.com</code>.
+                    ]]></comment>
+                </field>
+            </group>
+
+            <group id="general"
+                   translate="label"
+                   type="text"
+                   sortOrder="10"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>General Settings</label>
+                <field id="enabled"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Enable Module</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[
+                        Master switch.<br/>
+                        <strong>Yes</strong> = render ETA badges and the order-email injection where enabled
+                        under "Display Locations" below.<br/>
+                        <strong>No</strong> = module silently does nothing on the storefront. Useful for
+                        quickly toggling all ETA rendering off without removing the configuration.
+                    ]]></comment>
+                </field>
+                <field id="default_eta"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Default Restock Date</label>
+                    <comment><![CDATA[
+                        Fallback text used for sold-out / backorder products that have no per-product
+                        <em>Restock Date</em> value set. Combined with the Label Prefix below.
+                        Per-store-view configurable.<br/>
+                        Examples: <code>5-7 business days</code>, <code>2 weeks</code>, <code>next month</code>.<br/>
+                        Leave blank to suppress the fallback — products with no per-product value will
+                        then not display any badge at all.
+                    ]]></comment>
+                </field>
+                <field id="label_prefix"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Label Prefix (default text only)</label>
+                    <comment><![CDATA[
+                        Prefix prepended to the Default Restock Date only. Examples: <code>Ships in</code>,
+                        <code>Available in</code>, <code>Restock:</code>.<br/>
+                        <strong>Per-product Restock Date values are shown verbatim</strong> with no prefix,
+                        so each product can have its own exact wording
+                        (e.g. <em>"Ships 15 December 2026"</em> or <em>"Pre-order — January batch"</em>).
+                    ]]></comment>
+                </field>
+            </group>
+
+            <group id="display"
+                   translate="label"
+                   type="text"
+                   sortOrder="20"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Display Locations</label>
+                <field id="show_on_product_page"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Show on Product Page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[
+                        <strong>Yes</strong> = render the restock-date badge below the price on the product
+                        detail page for sold-out products. Renders on both Luma and Hyvä themes.<br/>
+                        <strong>No</strong> = hide on the product page. The badge will still appear on
+                        cart / checkout / order email if those are enabled below.
+                    ]]></comment>
+                </field>
+                <field id="show_on_cart"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Show on Cart Page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[
+                        <strong>Yes</strong> = show the restock date next to each sold-out line item on
+                        the shopping cart page. Reassures customers <em>before</em> they commit to checkout.<br/>
+                        <strong>No</strong> = hide on cart.
+                    ]]></comment>
+                </field>
+                <field id="show_on_checkout"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="30"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Show on Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[
+                        <strong>Yes</strong> = show the restock date next to sold-out line items in the
+                        checkout summary (Hyvä Checkout supported via a view-model + phtml block).<br/>
+                        <strong>No</strong> = hide on checkout. Common choice if you only want the
+                        product page + cart to display restock dates.
+                    ]]></comment>
+                </field>
+                <field id="show_in_order_email"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="40"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Include in Order Confirmation Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[
+                        <strong>Yes</strong> = inject restock-date notes into sold-out line items in the
+                        order confirmation email (highest-engagement email any merchant sends).<br/>
+                        <strong>No</strong> = no email modification. Custom-email merchants who've
+                        rewritten the items.phtml block should leave this Yes — the module is a
+                        non-destructive plugin and will silently skip if the template was replaced.
+                    ]]></comment>
+                </field>
+                <field id="badge_style"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="50"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Badge Style</label>
+                    <source_model>ETechFlow\BackorderEtaDisplay\Model\Source\BadgeStyle</source_model>
+                    <comment><![CDATA[
+                        Visual treatment of the ETA badge:<br/>
+                        <strong>Warning</strong> (amber) — best for "this might delay your order" tone.<br/>
+                        <strong>Info</strong> (blue) — neutral, informational.<br/>
+                        <strong>Neutral</strong> (grey) — minimal, blends with the design.<br/>
+                        Both Luma and Hyvä templates honour this setting.
+                    ]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

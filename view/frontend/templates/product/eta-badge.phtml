@@ -1,0 +1,64 @@
+<?php
+/**
+ * Backorder ETA badge — product detail page.
+ *
+ * @var \ETechFlow\BackorderEtaDisplay\Block\Product\EtaBadge $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+if (!$block->isVisible()) {
+    return;
+}
+
+$style = $block->getBadgeStyle();
+?>
+<div class="etechflow-eta-badge etechflow-eta-badge--<?= $escaper->escapeHtmlAttr($style) ?>"
+     role="note">
+    <span class="etechflow-eta-badge__icon" aria-hidden="true"></span>
+    <span class="etechflow-eta-badge__text">
+        <?= $escaper->escapeHtml($block->getDisplayText()) ?>
+    </span>
+</div>
+<style>
+    .etechflow-eta-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0 12px;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.4;
+        border-radius: 4px;
+        border-left: 3px solid;
+    }
+    .etechflow-eta-badge__icon {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+    .etechflow-eta-badge--warning {
+        background: #fff8e1;
+        color: #92400e;
+        border-left-color: #f59e0b;
+    }
+    .etechflow-eta-badge--warning .etechflow-eta-badge__icon {
+        background: #f59e0b;
+    }
+    .etechflow-eta-badge--info {
+        background: #e3f2fd;
+        color: #0d47a1;
+        border-left-color: #1976d2;
+    }
+    .etechflow-eta-badge--info .etechflow-eta-badge__icon {
+        background: #1976d2;
+    }
+    .etechflow-eta-badge--neutral {
+        background: #f1f5f9;
+        color: #334155;
+        border-left-color: #64748b;
+    }
+    .etechflow-eta-badge--neutral .etechflow-eta-badge__icon {
+        background: #64748b;
+    }
+</style>

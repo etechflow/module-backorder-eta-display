@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Append backorder ETA summary to order confirmation emails. -->
+    <type name="Magento\Sales\Block\Order\Email\Items">
+        <plugin name="etechflow_backorder_eta_email"
+                type="ETechFlow\BackorderEtaDisplay\Plugin\OrderEmailItemsPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <!-- Register the v1.1.0 verification command: bin/magento etechflow:bed:verify -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="etechflow_bed_verify" xsi:type="object">ETechFlow\BackorderEtaDisplay\Console\Command\VerifyCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>
