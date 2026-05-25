@@ -11,25 +11,34 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 /**
- * v1.2.1 — rename the customer-facing label of the `backorder_eta` product
- * attribute from "Backorder ETA" to "Restock Date".
+ * v1.2.1 — relabel the `backorder_eta` product attribute. Despite the
+ * class name, this patch does NOT rename the attribute_code. It only
+ * updates two display strings:
  *
- * The DB column name stays `backorder_eta` (renaming would break every
- * install's data). Only the frontend label + admin note change. Shoppers
- * never see either — but merchants do, on every product edit page.
+ *   - `frontend_label`: "Backorder ETA"  →  "Restock Date"
+ *   - `note`            : (old text)      →  new customer-facing wording
  *
- * Why: "backorder" is industry jargon. Customer-facing language uses
- * "restock date" / "available date" / "temporarily sold out" — shoppers
- * understand those without context. Merchants benefit too because the
- * field label now matches the customer-facing language they'd use when
- * writing the actual ETA text into it.
+ * The attribute_code stays `backorder_eta` permanently. Renaming the
+ * code would orphan every saved value (Magento stores values keyed by
+ * attribute_id, but external integrations / themes / SQL queries
+ * reference the code string). Same reason Magento core kept the
+ * `manufacturer` attribute_code unchanged when its label was relabelled
+ * to "Brand" — install-data safety wins over naming purity.
  *
- * Idempotent — checks the current label before overwriting. Re-running
- * setup:upgrade is a no-op.
+ * In hindsight the class should have been named
+ * `RelabelBackorderEtaAsRestockDate` or
+ * `UpdateBackorderEtaLabelToRestockDate`. We can't rename it now without
+ * either re-firing the patch on installs that already ran it, or leaving
+ * a dangling `patch_list` row on disk-removed-but-DB-present installs.
+ * So the name stays and this docblock is the warning.
  *
- * The original AddBackorderEtaAttribute patch was updated in lockstep
- * with this one, so fresh installs get the new label directly. This
- * patch only fires on installs that already ran the v1.0.x patch.
+ * The original `AddBackorderEtaAttribute` patch was updated in lockstep
+ * with this one, so fresh installs get the "Restock Date" label
+ * directly from the attribute-creation patch. This patch only does work
+ * on installs that already ran the original v1.0.x creation patch with
+ * the old "Backorder ETA" label.
+ *
+ * Idempotent — re-running `setup:upgrade` is a no-op.
  */
 class RenameBackorderEtaToRestockDate implements DataPatchInterface
 {

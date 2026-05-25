@@ -4,6 +4,78 @@ All notable changes to this module. Adheres to [Semantic Versioning](https://sem
 
 ---
 
+## [1.2.2] — 2026-05-25 — Always-a-patch discipline + clarify rename patch docblock
+
+Two additive changes, no behaviour change, no schema/API change. Drop-in
+upgrade from 1.2.1.
+
+### Added
+
+- **`Setup/Patch/Data/V122ReleaseMarker.php`** — no-op release marker.
+  Establishes the discipline that every BED release ships at least one
+  data patch, even if it has nothing to do. This guarantees
+  `setup:upgrade` always has SOMETHING to register in `patch_list`,
+  surfacing FS / permissions / DI errors during the patch phase (which
+  retries cleanly) instead of at the end of the upgrade (which doesn't).
+
+  Same pattern shipped in NDE v1.7.1 after the v1.7.0 Keystation deploy
+  incident — a version bump with zero patches risks the same site-down
+  condition where `setup:upgrade` aborts post-patch, `data_version`
+  never advances, and DbStatusValidator returns 500 on every request
+  until rollback.
+
+  Future releases copy this template (`V123ReleaseMarker`, etc).
+
+### Changed
+
+- **`RenameBackorderEtaToRestockDate` docblock** rewritten to make
+  clear that this patch ONLY relabels the attribute (the
+  `frontend_label` and `note`), NOT the attribute_code. The class name
+  is misleading — `attribute_code = 'backorder_eta'` is deliberately
+  permanent because renaming it would orphan every saved value and
+  break custom themes / integrations / SQL queries. Same reason
+  Magento core kept the `manufacturer` code unchanged when its label
+  was relabelled to "Brand".
+
+  Class name kept as-is (renaming would either re-fire the patch on
+  installs that already ran it or leave dangling `patch_list` rows).
+  Docblock now warns future readers.
+
+### Files added
+
+```
+Setup/Patch/Data/V122ReleaseMarker.php
+```
+
+### Files modified
+
+```
+Setup/Patch/Data/RenameBackorderEtaToRestockDate.php   (docblock only)
+etc/module.xml                                          (1.2.1 → 1.2.2)
+composer.json                                           (1.2.1 → 1.2.2)
+```
+
+### Upgrade
+
+```bash
+composer require etechflow/module-backorder-eta-display:^1.2.2
+bin/magento setup:upgrade
+# Watch for warnings — if any appear, do NOT cache:flush yet.
+bin/magento setup:di:compile
+bin/magento setup:static-content:deploy -f
+bin/magento cache:flush
+```
+
+Pre-flight check after upgrade:
+```sql
+SELECT module, schema_version, data_version FROM setup_module
+WHERE module='ETechFlow_BackorderEtaDisplay';
+```
+Both columns should read `1.2.2`. If `data_version` is stale, re-run
+`setup:upgrade` before flushing cache.
+
+---
+
 ## [1.2.1] — 2026-05-18 — Friendly-language pass
 
 Customer-facing copy now leads with shopper-friendly phrasing instead of trade jargon. "Backorder ETA" was the right phrase for the original spec but "restock date" / "available date" / "temporarily sold out" lands better with actual shoppers. Drop-in upgrade — no behaviour change, just labels and copy.

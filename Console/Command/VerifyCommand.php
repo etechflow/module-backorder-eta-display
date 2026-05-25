@@ -270,7 +270,7 @@ class VerifyCommand extends Command
             $this->pass($output, 'configurable + virtual short-circuited');
 
             $output->writeln('');
-            $output->writeln('<info>✅ ALL CHECKS PASSED. Backorder ETA Display v1.2.1 verified end-to-end.</info>');
+            $output->writeln('<info>✅ ALL CHECKS PASSED. Backorder ETA Display v1.2.2 verified end-to-end.</info>');
         } catch (\Throwable $e) {
             $allPassed = false;
             $output->writeln('');
