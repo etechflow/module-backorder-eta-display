@@ -58,6 +58,22 @@ class EtaBadge extends Template
             return false;
         }
 
+        // v1.2.3: optional "next-day suppresses ETA" rule. When the merchant has
+        // both ETechFlow_NextDayEligibility installed AND the new admin toggle
+        // is ON, hide this badge for products that are already showing the
+        // Next Day Eligible badge — otherwise the PDP renders two contradictory
+        // claims ("Next Day Eligible" + "Ships in 5-7 business days") on the
+        // same product.
+        //
+        // Soft-detected: if NDE isn't installed the attribute doesn't exist,
+        // getData() returns null/empty, the rule is a no-op. BED remains fully
+        // standalone-capable. No hard module dependency, no FQCN reference.
+        if ($this->config->isHideIfNextDayEligible()
+            && (int) $product->getData(Config::NEXT_DAY_ELIGIBLE_ATTR) === 1
+        ) {
+            return false;
+        }
+
         return $this->getDisplayText() !== '';
     }
 

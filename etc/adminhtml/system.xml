@@ -223,6 +223,36 @@
                         Both Luma and Hyvä templates honour this setting.
                     ]]></comment>
                 </field>
+                <field id="hide_if_next_day_eligible"
+                       translate="label comment tooltip"
+                       type="select"
+                       sortOrder="60"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Hide PDP Badge When Product is Next Day Eligible</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Yes hides the "Ships in X business days" badge on product pages when the product is also flagged Next Day Eligible.</tooltip>
+                    <comment><![CDATA[
+                        <strong>Only relevant if you also have
+                        <em>etechflow/module-next-day-eligibility</em> installed.</strong><br/><br/>
+                        Resolves the contradiction where a product shows BOTH the green
+                        "Next Day Eligible" badge AND the amber "Ships in 5-7 business days" badge.
+                        The two messages confuse customers — one says fast, the other says slow.<br/><br/>
+                        <strong>Yes</strong> — on product pages, hide the restock-date badge when the
+                        product is Next Day Eligible. The green badge tells the story; the slow ETA is
+                        suppressed. Products that are backordered AND <em>not</em> next-day-eligible
+                        still show the restock date as normal.<br/>
+                        <strong>No</strong> (default) — show both badges if both modules say to.
+                        Behaviour unchanged from earlier versions.<br/><br/>
+                        Only affects the product-page badge. The cart-page summary, checkout note,
+                        and order-confirmation email injection are unaffected — those still fire on
+                        any backorder line item regardless of next-day eligibility.<br/><br/>
+                        Soft-detected: if Next Day Eligibility isn't installed, this setting is a
+                        no-op (the attribute doesn't exist, the check falls through). Safe to leave
+                        on Yes even if you uninstall NDE later.
+                    ]]></comment>
+                </field>
             </group>
         </section>
     </system>

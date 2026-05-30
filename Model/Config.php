@@ -17,6 +17,10 @@ class Config
     private const XML_PATH_SHOW_ON_CHECKOUT     = 'etechflow_backorderetadisplay/display/show_on_checkout';
     private const XML_PATH_SHOW_IN_ORDER_EMAIL  = 'etechflow_backorderetadisplay/display/show_in_order_email';
     private const XML_PATH_BADGE_STYLE          = 'etechflow_backorderetadisplay/display/badge_style';
+    private const XML_PATH_HIDE_IF_NEXT_DAY     = 'etechflow_backorderetadisplay/display/hide_if_next_day_eligible';
+
+    /** Product attribute the next-day-suppression rule reads. */
+    public const NEXT_DAY_ELIGIBLE_ATTR = 'next_day_eligible';
 
     /**
      * Constructor.
@@ -115,6 +119,28 @@ class Config
     {
         return $this->scopeConfig->isSetFlag(
             self::XML_PATH_SHOW_IN_ORDER_EMAIL,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * Whether the PDP badge should be suppressed when the product is also
+     * flagged Next Day Eligible by ETechFlow_NextDayEligibility.
+     *
+     * Resolves the "Next Day Eligible + Ships in 5-7 business days" contradiction
+     * that hits any merchant running both modules. Default is FALSE (no change to
+     * existing installs). Merchants opt in via admin.
+     *
+     * Soft-detected: this getter just reads the config flag. The next-day check
+     * at the badge level reads the `next_day_eligible` attribute via
+     * Product::getData() — if NDE isn't installed the attribute doesn't exist,
+     * getData() returns null, the rule is a no-op, and BED remains fully
+     * standalone-capable.
+     */
+    public function isHideIfNextDayEligible(): bool
+    {
+        return $this->scopeConfig->isSetFlag(
+            self::XML_PATH_HIDE_IF_NEXT_DAY,
             ScopeInterface::SCOPE_STORE
         );
     }

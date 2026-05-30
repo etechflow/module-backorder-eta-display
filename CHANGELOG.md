@@ -4,6 +4,77 @@ All notable changes to this module. Adheres to [Semantic Versioning](https://sem
 
 ---
 
+## [1.2.3] — 2026-05-30 — Optional next-day-eligibility suppression on PDP
+
+Resolves a real-world contradiction merchants hit when running both
+this module and `etechflow/module-next-day-eligibility`: a product can
+show both the green "Next Day Eligible" badge AND the amber "Ships in
+5-7 business days" badge on the same PDP, confusing customers with
+contradictory delivery promises. Surfaced live on Keystation.
+
+### Added
+
+- **New admin field** under *Stores → Configuration → eTechFlow →
+  Backorder ETA Display → Display Locations*:
+  **"Hide PDP Badge When Product is Next Day Eligible"** (Yes/No,
+  default **No**).
+  When set to **Yes** AND the product's `next_day_eligible` attribute
+  equals `1`, `EtaBadge::isVisible()` returns false on the PDP — the
+  Next-Day-Eligible badge wins the messaging slot, the slow ETA is
+  suppressed. Only product page is affected; cart/checkout/email still
+  fire on every backorder line regardless.
+- **Soft-detected NDE integration** — no hard module dependency, no FQCN
+  reference. The check reads the product attribute via `getData()`. If
+  NDE isn't installed, the attribute doesn't exist, the check
+  no-ops, BED remains fully standalone-capable. Safe to set Yes even on
+  installs that may uninstall NDE later.
+- **`Setup/Patch/Data/V123ReleaseMarker.php`** — continues the always-a-
+  patch discipline. Depends on `V122ReleaseMarker` so patches run in
+  version order.
+
+### Changed
+
+- `Model/Config.php`: new `XML_PATH_HIDE_IF_NEXT_DAY` constant,
+  `NEXT_DAY_ELIGIBLE_ATTR` public const, `isHideIfNextDayEligible()`
+  getter.
+- `Block/Product/EtaBadge.php::isVisible()`: extra check between the
+  backorder gate and the display-text gate. Five new LOC.
+- `Console/Command/VerifyCommand.php`: version literal 1.2.2 → 1.2.3.
+
+### Not changed
+
+- **No schema changes, no DI changes, no API breakage.** Drop-in
+  upgrade from 1.2.2.
+- **Default behaviour is identical to 1.2.2** — the new toggle
+  defaults to No. Existing installs see no change unless they opt in.
+
+### Migration
+
+```bash
+composer require etechflow/module-backorder-eta-display:^1.2.3
+bin/magento setup:upgrade
+bin/magento setup:di:compile
+bin/magento cache:flush
+```
+
+To opt in: *Stores → Configuration → eTechFlow → Backorder ETA Display →
+Display Locations* → **Hide PDP Badge When Product is Next Day Eligible**
+→ **Yes** → Save → flush cache.
+
+### When you should turn it on
+
+You should turn it on if all three are true:
+1. You have `etechflow/module-next-day-eligibility` installed
+2. Some of your products are flagged Next-Day-Eligible AND would also be
+   on backorder (e.g. drop-ship products where NDE auto-enables backorders)
+3. You'd rather customers see "Next Day Eligible" alone than both
+   badges fighting each other
+
+If you don't have NDE installed, leave it at No — the toggle does
+nothing in that case anyway.
+
+---
+
 ## [1.2.2] — 2026-05-25 — Always-a-patch discipline + clarify rename patch docblock
 
 Two additive changes, no behaviour change, no schema/API change. Drop-in
