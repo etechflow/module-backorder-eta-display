@@ -4,6 +4,80 @@ All notable changes to this module. Adheres to [Semantic Versioning](https://sem
 
 ---
 
+## [1.3.0] — 2026-06-02 — Stripe portal licensing + tri-state validation
+
+Replaces the HMAC-only licence model with a Stripe Checkout subscription
+flow gated by the eTechFlow licensing portal. Customers can now subscribe
+directly from inside Magento Admin without ever leaving the panel — plan
+selection, card entry, and SP-XXXX key activation all happen in the same
+embedded frame. HMAC validation is retained as a fallback so existing
+v1.2.x licences continue to work without re-activation.
+
+### Added
+
+- **Admin subscription gate** under *Stores → Configuration → ETECHFLOW →
+  Backorder ETA Display* — when no licence is detected on a production
+  environment, the configuration page is replaced with three plan cards
+  (Starter $19/mo, Professional $49/mo, Enterprise $99/mo) and an
+  embedded customer-details form.
+- **`Controller/Adminhtml/License/Checkout.php`** — builds a Stripe
+  Checkout session against the selected plan and redirects the browser
+  to Stripe's hosted payment page.
+- **`Controller/Adminhtml/License/Activated.php`** — Stripe success-URL
+  endpoint. Calls the portal's `/license/activate` route with the
+  session ID, decrypts the stored secret key, receives an SP-XXXX
+  licence in the response, and writes it to `core_config_data`.
+- **Three new admin fields** in *License* group: `portal_url`,
+  `portal_api_url`. New *Payment* group: `stripe_secret_key` (obscured
+  + encrypted backend model), `stripe_publishable_key`, `stripe_currency`.
+- **Tri-state portal validation** in `Model/LicenseValidator.php` — the
+  validator now returns `?bool` for portal calls: `true` (valid),
+  `false` (explicit reject, HTTP 200+valid:false / 401 / 403), or
+  `null` (unreachable). Only `null` falls back to the 48h local grace,
+  so admin IP-removal or subscription suspension locks the storefront
+  immediately rather than waiting for the grace window to expire.
+- **Split cache TTLs** — valid responses cached 1h
+  (`CACHE_TTL_VALID = 3600`), explicit rejections cached only 60s
+  (`CACHE_TTL_REJECT = 60`) so re-authorisation propagates fast.
+
+### Changed
+
+- `Model/LicenseValidator.php` constructor now takes 4 arguments
+  (`ScopeConfigInterface`, `StoreManagerInterface`, `CacheInterface`,
+  `Curl`) — added Cache + Curl dependencies for portal validation. Any
+  caller using `ObjectManager::get()` is unaffected. Direct
+  instantiation in tests or DI overrides needs updating.
+- `isValid()` SP-key branch now calls the portal **before** checking
+  the local 48h grace. The grace is only used when the portal cannot
+  be reached, never when the portal explicitly rejects.
+- Removed the hyphen-suffix dev-host bypass (e.g. `*-dev.com`,
+  `*-staging.com`, `*-uat.com`). It false-matched legitimate production
+  hosts like `magento-dev.etechflow.com` and gave them a free unlimited
+  bypass. Hosts matching `dev.`, `staging.`, `uat.` etc. as a
+  subdomain prefix still bypass.
+- Added `.ngrok-free.dev` to the recognised tunnel suffixes.
+
+### Test changes
+
+- `Test/Unit/Model/LicenseValidatorTest.php` constructor calls updated
+  to 4-arg form with mocked `CacheInterface` and `Curl`.
+- Removed 3 dev-host bypass entries that tested the now-removed
+  hyphen-suffix behaviour. Added one entry for `.ngrok-free.dev`.
+
+### Upgrade notes
+
+- `bin/magento setup:upgrade` will need a generated/code wipe before
+  it runs cleanly: `rm -rf generated/code/* generated/metadata/* var/cache/*`
+  — the validator's constructor arity changed from 2 to 4 and stale
+  metadata causes `ArgumentCountError`.
+- Set your Stripe keys after upgrade: *Stores → Configuration →
+  ETECHFLOW → Backorder ETA Display → Payment*. Secret key is stored
+  encrypted via Magento's Encrypted backend model.
+- Existing v1.2.x HMAC licences are NOT affected — `isValid()` only
+  enters the portal branch for SP-prefixed keys.
+
+---
+
 ## [1.2.3] — 2026-05-30 — Optional next-day-eligibility suppression on PDP
 
 Resolves a real-world contradiction merchants hit when running both
