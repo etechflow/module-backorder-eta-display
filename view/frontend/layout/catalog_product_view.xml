@@ -2,11 +2,23 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="product.info.main">
+        <!--
+            Parent the backorder ETA badge to the `product.info.additional`
+            slot, which renders just after the add-to-cart area on Luma, on
+            the vanilla Hyva theme, and on custom Hyva child themes alike.
+
+            (Previously parented to the `product.info.main` *container* with
+            `after="product.info.price"`. On Hyva-based themes `product.info.main`
+            is a container and the price lives inside the inner `product.info`
+            *block*, so the `after` reference was a no-op and the badge orphaned
+            to the bottom of the page. `product.info.additional` is a real,
+            rendered slot on every theme, matching the sibling
+            next-day-eligibility module.)
+        -->
+        <referenceContainer name="product.info.additional">
             <block class="ETechFlow\BackorderEtaDisplay\Block\Product\EtaBadge"
                    name="etechflow.backorder.eta.badge"
-                   template="ETechFlow_BackorderEtaDisplay::product/eta-badge.phtml"
-                   after="product.info.price"/>
-        </referenceBlock>
+                   template="ETechFlow_BackorderEtaDisplay::product/eta-badge.phtml"/>
+        </referenceContainer>
     </body>
 </page>
